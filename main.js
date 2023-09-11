@@ -6,37 +6,119 @@ function sendsaisoku(link, recipientEmail,name) {
              "締め切りまで時間はありますが、早めのご回答をお願いいたします。\n\n" +
              "以下フォームのリンクです:\n" +
              link + "\n\n" +
-             "所属団体名"; // メールの本文を指定
+             ""; // メールの本文を指定
 
   // メールを送信
   GmailApp.sendEmail(recipientEmail, subject, body);
 }
 
-// 会員全員の二次元配列を作る
-function getkaiin() {
+// 回答未回答関わらず対象者全員の二次元配列を作る
+function getkaiin(taisyo) {
+  Logger.log("taisyo"+taisyo);
   var spreadsheetURL = "https://docs.google.com/spreadsheets/d/1yVz4JAEbmoFqDDe37zEvXqXEotEvSxoWOfR6m6Ixme0/edit#gid=0";
   
   // スプレッドシートを開く
   var spreadsheet = SpreadsheetApp.openByUrl(spreadsheetURL);
-  
+
+  if(taisyo=="現役代"){//１，２，３年生を指定する
+    // シートを選択
+    var sheet = spreadsheet.getSheetByName("１年生"); // 対象のシートを選択
+    // A2から最後の行までのデータを取得
+    var dataRange = sheet.getRange("A2:B" + sheet.getLastRow());
+    var values1 = dataRange.getValues();
+    
+    // シートを選択
+    sheet = spreadsheet.getSheetByName("２年生"); // 対象のシートを選択
+    // A2から最後の行までのデータを取得
+    dataRange = sheet.getRange("A2:B" + sheet.getLastRow());
+    var values2 = dataRange.getValues();
+
+    // シートを選択
+    sheet = spreadsheet.getSheetByName("３年生"); // 対象のシートを選択
+    // A2から最後の行までのデータを取得
+    dataRange = sheet.getRange("A2:B" + sheet.getLastRow());
+    var values3 = dataRange.getValues();
+
+    mergedvalues=[];
+
+    // value1をmergedvaluesに追加
+    for (var i = 0; i < values1.length; i++) {
+      mergedvalues.push(values1[i]);
+    }
+
+    // values2をmeredvalues追加
+    for (var j = 0; j < values2.length; j++) {
+      mergedvalues.push(values2[j]);
+    }
+
+    // values3をmergedvaluesに追加
+    for (var i = 0; i < values3.length; i++) {
+      mergedvalues.push(values3[i]);
+    }
+
+    Logger.log("kaiin:"+mergedvalues);
+    return mergedvalues;
+  }
+  if(taisyo=="学生全員"){//１，２，３,４年生を指定する
+    // シートを選択
+    var sheet = spreadsheet.getSheetByName("１年生"); // 対象のシートを選択
+    // A2から最後の行までのデータを取得
+    var dataRange = sheet.getRange("A2:B" + sheet.getLastRow());
+    var values1 = dataRange.getValues();
+    
+    // シートを選択
+    sheet = spreadsheet.getSheetByName("２年生"); // 対象のシートを選択
+    // A2から最後の行までのデータを取得
+    dataRange = sheet.getRange("A2:B" + sheet.getLastRow());
+    var values2 = dataRange.getValues();
+
+    // シートを選択
+    sheet = spreadsheet.getSheetByName("３年生"); // 対象のシートを選択
+    // A2から最後の行までのデータを取得
+    dataRange = sheet.getRange("A2:B" + sheet.getLastRow());
+    var values3 = dataRange.getValues();
+
+    // シートを選択
+    sheet = spreadsheet.getSheetByName("４年生"); // 対象のシートを選択
+    // A2から最後の行までのデータを取得
+    dataRange = sheet.getRange("A2:B" + sheet.getLastRow());
+    var values4 = dataRange.getValues();
+
+    mergedvalues=[];
+
+    // value1をmergedvaluesに追加
+    for (var i = 0; i < values1.length; i++) {
+      mergedvalues.push(values1[i]);
+    }
+
+    // values2をmeredvalues追加
+    for (var j = 0; j < values2.length; j++) {
+      mergedvalues.push(values2[j]);
+    }
+
+    // values3をmergedvaluesに追加
+    for (var i = 0; i < values3.length; i++) {
+      mergedvalues.push(values3[i]);
+    }
+    // values4をmergedvaluesに追加
+    for (var i = 0; i < values4.length; i++) {
+      mergedvalues.push(values4[i]);
+    }
+
+    Logger.log("kaiin:"+mergedvalues);
+    return mergedvalues;
+  }
+
   // シートを選択（シート名を指定する場合は、getSheetByNameを使用）
-  var sheet = spreadsheet.getSheets()[0]; // 1つ目のシートを選択
+  var sheet = spreadsheet.getSheetByName(taisyo); // 対象のシートを選択
 
   // A2から最後の行までのデータを取得
   var dataRange = sheet.getRange("A2:B" + sheet.getLastRow());
   var values = dataRange.getValues();
 
-  // データを二次元配列に入れる
-  var data = [];
-
-  for (var i = 0; i < values.length; i++) {
-    var rowData = values[i];
-    data.push(rowData);
-  }
-
-  // データをログに出力（テスト用）
-  Logger.log(data);
-  return data;
+  // データをログに出力
+  Logger.log("kaiin:"+values);
+  return values;
 }
 
 
@@ -92,6 +174,7 @@ function comparemember(kaiin, answer,link){
       if(kaiin[i][0]==answer[j]){
         Logger.log("ちゃんと回答しています。")
         flag=1;//回答者がいれば
+        break;
       }
     }
     if(flag==0){
@@ -105,7 +188,7 @@ function comparemember(kaiin, answer,link){
 //main関数
 function myFunction() {
   Logger.log("プログラムが起動しました")
-  // スプレッドシートのURL
+  // スプレッドシートのURL　グーグルフォーム場所
   var spreadsheetURL = "https://docs.google.com/spreadsheets/d/1_TFydhDYs58cB5eePO8gtEMPrPf3GkdPv3mEeQmu9JU/edit#gid=0";
 
   // スプレッドシートを開く
@@ -129,8 +212,10 @@ function myFunction() {
       // 例えば、メッセージをログに記録する場合
       Logger.log("D"+i+"セルの値と本日の日付が一致しました。");
       var link = sheet.getRange("B" +i).getValue(); // Biセルの値を取得
+      var taisyo = sheet.getRange("F" +i).getValue(); // Fiセルの値を取得
+      Logger.log(taisyo);
       var answer=getFormanswer(link);
-      var kaiin= getkaiin();
+      var kaiin= getkaiin(taisyo);
       comparemember(kaiin,answer,link);
       // ここで他の処理を実行できます。
     }
